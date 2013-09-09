@@ -7,6 +7,7 @@
 #include <boost/bind.hpp>
 
 // custom includes
+#include <lwr/LwrLibrary.hpp>
 
 
 namespace gazebo
@@ -98,12 +99,20 @@ namespace gazebo
   void
   LwrModelPlugin::updateRobotState()
   {
+    // joints
     for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
       physics::JointPtr currJoint = m_joints[jointIdx];
       m_jointsCurrent.position[jointIdx] = currJoint->GetAngle(0).Radian();
       m_jointsCurrent.velocity[jointIdx] = currJoint->GetVelocity(0);
     }
-    // TODO m_cartesianPoseCurrent
+
+    // cartesian
+    LwrXCart cartPose;
+    LwrJoints joints;
+    joints.setJoints(m_jointsCurrent.position);
+    Lwr::forwardKinematics(cartPose, joints);
+    cartPose.pose.getPos(m_cartesianPoseCurrent.position.x, m_cartesianPoseCurrent.position.y, m_cartesianPoseCurrent.position.z);
+    cartPose.pose.getQuat(m_cartesianPoseCurrent.orientation.x, m_cartesianPoseCurrent.orientation.y, m_cartesianPoseCurrent.orientation.z, m_cartesianPoseCurrent.orientation.w);
   }
 
   void
