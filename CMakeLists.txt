@@ -4,11 +4,13 @@ project(lwr_gazebo)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  gazebo_ros
+  roscpp
+)
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
-
+find_package(gazebo REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -52,21 +54,29 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES lwr_gazebo
 #  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
+  DEPENDS
+    roscpp
+    gazebo_ros
 )
 
 ###########
 ## Build ##
 ###########
 
+link_directories(${GAZEBO_LIBRARY_DIRS})
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+  ${GAZEBO_INCLUDE_DIRS}
+)
 
 ## Declare a cpp library
-# add_library(lwr_gazebo
-#   src/${PROJECT_NAME}/lwr_gazebo.cpp
-# )
+add_library(LwrModelPlugin
+  src/LwrModelPlugin.cpp
+)
 
 ## Declare a cpp executable
 # add_executable(lwr_gazebo_node src/lwr_gazebo_node.cpp)
@@ -76,9 +86,10 @@ catkin_package(
 # add_dependencies(lwr_gazebo_node lwr_gazebo_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(lwr_gazebo_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(LwrModelPlugin
+  ${catkin_LIBRARIES}
+  ${GAZEBO_LIBRARIES}
+)
 
 #############
 ## Install ##
