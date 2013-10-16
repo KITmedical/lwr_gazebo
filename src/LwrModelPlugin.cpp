@@ -79,20 +79,45 @@ namespace gazebo
   }
 
   void
-  LwrModelPlugin::cartesianWriteCallback(const geometry_msgs::Pose::ConstPtr& pose)
+  LwrModelPlugin::cartesianWriteCallback(const geometry_msgs::Pose::ConstPtr& poseMsg)
   {
-    std::cout << "cartesianWriteCallback" << std::endl;
+    //std::cout << "cartesianWriteCallback: poseMsg=" << *poseMsg << std::endl;
+    tf::Pose tfpose;
+    tf::poseMsgToTF(*poseMsg, tfpose);
+    tf::Vector3 tforigin = tfpose.getOrigin();
+    tf::Quaternion tforientation = tfpose.getRotation();
+    LwrXCart cartXPose;
+    cartXPose.nsparam = 0;
+    cartXPose.config = 2;
+    cartXPose.pose.setPos(tforigin.x(), tforigin.y(), tforigin.z());
+    double x, y, z, w;
+    w = tforientation.w();
+    x = tforientation.x();
+    y = tforientation.y();
+    z = tforientation.z();
+    cartXPose.pose.setQuat(w, x, y, z);
+    LwrJoints joints;
+    LwrErrorMsg kinematicReturn;
+    kinematicReturn = Lwr::inverseKinematics(joints, cartXPose);
+    if (kinematicReturn != LWR_OK && kinematicReturn != (LWR_WARNING | LWR_CLOSE_TO_SINGULARITY)) {
+      ROS_WARN_STREAM("Lwr::inverseKinematics() failed: " << kinematicReturn);
+      return;
+    }
+    for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
+      m_joints[jointIdx]->SetAngle(0, joints.j[jointIdx]);
+    }
   }
 
   void
-  LwrModelPlugin::jointsWriteCallback(const sensor_msgs::JointState::ConstPtr& joints)
+  LwrModelPlugin::jointsWriteCallback(const sensor_msgs::JointState::ConstPtr& jointsMsg)
   {
-    if (joints->position.size() != m_jointsCurrent.position.size()) {
+    //std::cout << "jointsWriteCallback: jointsMsg=" << *jointsMsg << std::endl;
+    if (jointsMsg->position.size() != m_jointsCurrent.position.size()) {
       ROS_WARN("Wrong number of joints received. Ignoring message.");
       return;
     }
     for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
-      m_joints[jointIdx]->SetAngle(0, joints->position[jointIdx]);
+      m_joints[jointIdx]->SetAngle(0, jointsMsg->position[jointIdx]);
     }
   }
 
@@ -107,12 +132,17 @@ namespace gazebo
     }
 
     // cartesian
-    LwrXCart cartPose;
+    LwrXCart cartXPose;
     LwrJoints joints;
     joints.setJoints(m_jointsCurrent.position);
-    Lwr::forwardKinematics(cartPose, joints);
-    cartPose.pose.getPos(m_cartesianPoseCurrent.position.x, m_cartesianPoseCurrent.position.y, m_cartesianPoseCurrent.position.z);
-    cartPose.pose.getQuat(m_cartesianPoseCurrent.orientation.x, m_cartesianPoseCurrent.orientation.y, m_cartesianPoseCurrent.orientation.z, m_cartesianPoseCurrent.orientation.w);
+    LwrErrorMsg kinematicReturn;
+    kinematicReturn = Lwr::forwardKinematics(cartXPose, joints);
+    if (kinematicReturn != LWR_OK && kinematicReturn != (LWR_WARNING | LWR_SINGULARITY)) {
+      ROS_WARN_STREAM("Lwr::forwardKinematics() failed: " << kinematicReturn);
+      return;
+    }
+    cartXPose.pose.getPos(m_cartesianPoseCurrent.position.x, m_cartesianPoseCurrent.position.y, m_cartesianPoseCurrent.position.z);
+    cartXPose.pose.getQuat(m_cartesianPoseCurrent.orientation.w, m_cartesianPoseCurrent.orientation.x, m_cartesianPoseCurrent.orientation.y, m_cartesianPoseCurrent.orientation.z);
   }
 
   void

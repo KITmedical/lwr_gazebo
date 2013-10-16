@@ -5,12 +5,13 @@
 
 // library includes
 #include <gazebo/gazebo.hh>
-#include <physics/physics.hh>
-#include <common/common.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/common/common.hh>
 
 #include <ros/ros.h>
 #include <geometry_msgs/Pose.h>
 #include <sensor_msgs/JointState.h>
+#include <tf/transform_datatypes.h>
 
 // custom includes
 
