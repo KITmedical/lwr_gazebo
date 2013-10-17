@@ -19,6 +19,12 @@
 // forward declarations
 
 
+/* TODO
+ * move to FRI interface
+ * - send fri messages with 1000 Hz SIMULATED time (http://wiki.ros.org/Clock#Using_Simulation_Time_from_the_.2BAC8-clock_Topic)
+ * - read answer messages and set m_joints
+ */
+
 namespace gazebo {
   class LwrModelPlugin
     : public ModelPlugin
