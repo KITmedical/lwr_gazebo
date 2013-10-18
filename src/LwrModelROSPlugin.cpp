@@ -1,4 +1,4 @@
-#include "LwrModelPlugin.h"
+#include "LwrModelROSPlugin.h"
 
 // system includes
 #include <stdio.h>
@@ -14,9 +14,9 @@ namespace gazebo
 {
 /*---------------------------------- public: -----------------------------{{{-*/
   void
-  LwrModelPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf) 
+  LwrModelROSPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf) 
   {
-    std::cout << "------------------- LwrModelPlugin -------------------" << std::endl;
+    std::cout << "------------------- LwrModelROSPlugin -------------------" << std::endl;
 
     m_model = _parent;
 
@@ -33,9 +33,9 @@ namespace gazebo
 
 
     m_node = new ros::NodeHandle(m_nodeName);
-    m_cartesianWriteTopicSub = m_node->subscribe<geometry_msgs::Pose>(m_cartesianWriteTopicName, 1, &LwrModelPlugin::cartesianWriteCallback, this);
+    m_cartesianWriteTopicSub = m_node->subscribe<geometry_msgs::Pose>(m_cartesianWriteTopicName, 1, &LwrModelROSPlugin::cartesianWriteCallback, this);
     m_cartesianReadTopicPub = m_node->advertise<geometry_msgs::Pose>(m_cartesianReadTopicName, 1);
-    m_jointsWriteTopicSub = m_node->subscribe<sensor_msgs::JointState>(m_jointsWriteTopicName, 1, &LwrModelPlugin::jointsWriteCallback, this);
+    m_jointsWriteTopicSub = m_node->subscribe<sensor_msgs::JointState>(m_jointsWriteTopicName, 1, &LwrModelROSPlugin::jointsWriteCallback, this);
     m_jointsReadTopicPub = m_node->advertise<sensor_msgs::JointState>(m_jointsReadTopicName, 1);
 
     m_joints = m_model->GetJoints();
@@ -52,11 +52,11 @@ namespace gazebo
     // Listen to the update event. This event is broadcast every
     // simulation iteration.
     m_updateConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&LwrModelPlugin::OnUpdate, this));
+        boost::bind(&LwrModelROSPlugin::OnUpdate, this));
   }
 
   void
-  LwrModelPlugin::OnUpdate()
+  LwrModelROSPlugin::OnUpdate()
   {
     updateRobotState();
     publishRobotState();
@@ -65,7 +65,7 @@ namespace gazebo
 
 /*---------------------------------- private: ----------------------------{{{-*/
   bool
-  LwrModelPlugin::loadParams(sdf::ElementPtr _sdf)
+  LwrModelROSPlugin::loadParams(sdf::ElementPtr _sdf)
   {
     m_nodeName = _sdf->GetParent()->Get<std::string>("name");
 
@@ -79,7 +79,7 @@ namespace gazebo
   }
 
   void
-  LwrModelPlugin::cartesianWriteCallback(const geometry_msgs::Pose::ConstPtr& poseMsg)
+  LwrModelROSPlugin::cartesianWriteCallback(const geometry_msgs::Pose::ConstPtr& poseMsg)
   {
     //std::cout << "cartesianWriteCallback: poseMsg=" << *poseMsg << std::endl;
     tf::Pose tfpose;
@@ -109,7 +109,7 @@ namespace gazebo
   }
 
   void
-  LwrModelPlugin::jointsWriteCallback(const sensor_msgs::JointState::ConstPtr& jointsMsg)
+  LwrModelROSPlugin::jointsWriteCallback(const sensor_msgs::JointState::ConstPtr& jointsMsg)
   {
     //std::cout << "jointsWriteCallback: jointsMsg=" << *jointsMsg << std::endl;
     if (jointsMsg->position.size() != m_jointsCurrent.position.size()) {
@@ -122,7 +122,7 @@ namespace gazebo
   }
 
   void
-  LwrModelPlugin::updateRobotState()
+  LwrModelROSPlugin::updateRobotState()
   {
     // joints
     for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
@@ -146,7 +146,7 @@ namespace gazebo
   }
 
   void
-  LwrModelPlugin::publishRobotState()
+  LwrModelROSPlugin::publishRobotState()
   {
     m_cartesianReadTopicPub.publish(m_cartesianPoseCurrent);
     m_jointsReadTopicPub.publish(m_jointsCurrent);
@@ -155,5 +155,5 @@ namespace gazebo
 
 
   // Register this plugin with the simulator
-  GZ_REGISTER_MODEL_PLUGIN(LwrModelPlugin)
+  GZ_REGISTER_MODEL_PLUGIN(LwrModelROSPlugin)
 }
