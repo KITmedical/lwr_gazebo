@@ -11,10 +11,20 @@
       <uri>model://sun</uri>
     </include>
 
-    <!-- Focus camera on tall pendulum -->
+    <include>
+      <uri>model://or_table</uri>
+    </include>
+
+    <include>
+      <uri>model://lwr</uri>
+      <!-- TODO use M_PI instead of 3.14 -->
+      <pose>0.13 0.43 0.9 0 0 3.14</pose>
+      <!--lwr1: <pose>0.13 -0.43 0.9 0 0 3.14</pose> -->
+    </include>
+
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>4.927360 -4.376610 3.740080 0.000000 0.275643 2.356190</pose>
+        <pose>5 -5 4 0 0.3 2.3</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>

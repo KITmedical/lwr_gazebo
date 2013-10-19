@@ -31,10 +31,11 @@
     	args="-g libGazeboMISGuiPlugin.so" />
   </group>
 
-  <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find lwr_description)/urdf/lwr_OR-table.xacro'" />
+  <!-- Load the URDF into the ROS Parameter Server
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find lwr_description)/urdf/lwr.xacro'" />
 
-  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+  Run a python script to the send a service call to gazebo_ros to spawn a URDF robot
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model lwr -param robot_description"/>
+  -->
 
 </launch>
