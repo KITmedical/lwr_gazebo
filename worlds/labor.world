@@ -2,9 +2,29 @@
 <sdf version="1.4">
 
   <world name="labor">
-    <include>
-      <uri>model://sun</uri>
-    </include>
+    <scene>
+      <ambient>0.4 0.4 0.4 1.0</ambient>
+      <shadows>1</shadows>
+    </scene>
+
+    <light name="light_left_at_or_table" type="spot">
+      <cast_shadows>1</cast_shadows> <!-- TODO not working -->
+      <pose>-1.8 -6.7 3 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>10</range>
+        <linear>0.5</linear>
+        <constant>0.01</constant>
+        <quadratic>0</quadratic>
+      </attenuation>
+      <direction>0 0 -1</direction>
+      <spot>
+        <inner_angle>1.5</inner_angle>
+        <outer_angle>2.0</outer_angle>
+        <falloff>1</falloff>
+      </spot>
+    </light>
 
     <include>
       <uri>model://lab_walls</uri>
