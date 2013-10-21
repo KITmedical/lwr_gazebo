@@ -38,11 +38,19 @@ namespace gazebo
     m_jointsWriteTopicSub = m_node->subscribe<sensor_msgs::JointState>(m_jointsWriteTopicName, 1, &LwrModelROSPlugin::jointsWriteCallback, this);
     m_jointsReadTopicPub = m_node->advertise<sensor_msgs::JointState>(m_jointsReadTopicName, 1);
 
-    m_joints = m_model->GetJoints();
-    std::cout << "LWR joints:" << std::endl;
-    for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
-      physics::JointPtr currJoint = m_joints[jointIdx];
-      std::cout << jointIdx << " name=" << currJoint->GetName() << " angle=" << currJoint->GetAngle(0) << " v=" << currJoint->GetVelocity(0) << std::endl;
+    unsigned lwrNameLen = std::string("lwrN").size();
+    std::string pluginName = _sdf->GetAttribute("name")->GetAsString();
+    std::string lwrName = pluginName.substr(pluginName.size() - lwrNameLen);
+
+    // Extract only joints belonging to current lwr, even if it is part of larger model
+    physics::Joint_V joints = m_model->GetJoints();
+    std::cout << lwrName << " joints:" << std::endl;
+    for (size_t jointIdx = 0; jointIdx < joints.size(); jointIdx++) {
+      physics::JointPtr currJoint = joints[jointIdx];
+      if (lwrName == currJoint->GetName().substr(0, lwrNameLen)) {
+        m_joints.push_back(currJoint);
+        std::cout << jointIdx << " name=" << currJoint->GetName() << " angle=" << currJoint->GetAngle(0) << " v=" << currJoint->GetVelocity(0) << std::endl;
+      }
     }
 
     m_jointsCurrent.position.resize(m_joints.size(), 0);

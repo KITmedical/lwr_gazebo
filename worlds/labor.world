@@ -3,33 +3,21 @@
 
   <world name="labor">
     <include>
-      <uri>model://ground_plane</uri>
-    </include>
-
-    <!-- Global light source -->
-    <include>
       <uri>model://sun</uri>
     </include>
 
     <include>
-      <uri>model://or_table</uri>
+      <uri>model://lab_walls</uri>
     </include>
 
     <include>
-      <uri>model://lwr1</uri>
-      <!-- TODO use M_PI instead of 3.14 -->
-      <pose>0.13 -0.43 0.9 0 0 3.14</pose>
-    </include>
-
-    <include>
-      <uri>model://lwr2</uri>
-      <!-- TODO use M_PI instead of 3.14 -->
-      <pose>0.13 0.43 0.9 0 0 3.14</pose>
+      <uri>model://or_table_with_lwrs</uri>
+      <pose>-4.5 -7 0 0 0 0</pose>
     </include>
 
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>5 -5 4 0 0.3 2.3</pose>
+        <pose>-6.4 -10.6 2.3 0 0.36 1.12</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>

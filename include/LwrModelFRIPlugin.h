@@ -57,7 +57,8 @@ namespace gazebo {
       event::ConnectionPtr m_updateConnection;
       physics::Joint_V m_joints;
 
-      // ros
+      // fri
+      uint16_t m_friPort;
   
   
   };
