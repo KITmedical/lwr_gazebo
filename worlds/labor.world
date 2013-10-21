@@ -16,10 +16,15 @@
     </include>
 
     <include>
-      <uri>model://lwr</uri>
+      <uri>model://lwr1</uri>
+      <!-- TODO use M_PI instead of 3.14 -->
+      <pose>0.13 -0.43 0.9 0 0 3.14</pose>
+    </include>
+
+    <include>
+      <uri>model://lwr2</uri>
       <!-- TODO use M_PI instead of 3.14 -->
       <pose>0.13 0.43 0.9 0 0 3.14</pose>
-      <!--lwr1: <pose>0.13 -0.43 0.9 0 0 3.14</pose> -->
     </include>
 
     <gui fullscreen='0'>
