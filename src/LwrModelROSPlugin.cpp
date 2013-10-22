@@ -21,7 +21,7 @@ namespace gazebo
     m_model = _parent;
 
     if (!ros::isInitialized()) {
-      ROS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
+      ROS_FATAL_STREAM("LwrModelROSPlugin: A ROS node for Gazebo has not been initialized, unable to load plugin. "
         << "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
       return;
     }
