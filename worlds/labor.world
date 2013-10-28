@@ -55,6 +55,25 @@
       <pose>-4.5 -7 0 0 0 0</pose>
     </include>
 
+
+    <!-- TODO move to lwr1_with_manta_0deg -->
+    <include>
+      <uri>model://manta_g201c_poe_with_wolf_panoview_0deg</uri>
+    </include>
+
+    <joint name="lwr1_manta_joint" type="revolute">
+      <parent>or_table_with_lwrs::lwr1_arm7_link</parent>
+      <child>manta_g201c_poe_with_wolf_panoview_0deg::manta_g201c_poe_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+
+
     <gui fullscreen='0'>
       <camera name='user_camera'>
         <pose>-6.4 -10.6 2.3 0 0.36 1.12</pose>
