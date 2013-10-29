@@ -47,7 +47,7 @@ namespace gazebo
     std::cout << lwrName << " joints:" << std::endl;
     for (size_t jointIdx = 0; jointIdx < joints.size(); jointIdx++) {
       physics::JointPtr currJoint = joints[jointIdx];
-      if (lwrName == currJoint->GetName().substr(0, lwrNameLen)) {
+      if (lwrName == currJoint->GetName().substr(0, lwrNameLen) || currJoint->GetName().find(std::string("::") + lwrName) != std::string::npos) {
         m_joints.push_back(currJoint);
         std::cout << jointIdx << " name=" << currJoint->GetName() << " angle=" << currJoint->GetAngle(0) << " v=" << currJoint->GetVelocity(0) << std::endl;
       }
