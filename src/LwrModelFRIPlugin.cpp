@@ -21,10 +21,21 @@ namespace gazebo
 
     m_model = _parent;
 
+    m_updatePeriod = 0.001;
+
+    if (!ros::isInitialized()) {
+      ROS_FATAL_STREAM("LwrModelFRIPlugin: A ROS node for Gazebo has not been initialized, unable to load plugin. "
+        << "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
+      return;
+    }
+
     if (!loadParams(_sdf)) {
       std::cout << "Error during loadParams" << std::endl;
       return;
     }
+
+    m_node = new ros::NodeHandle(m_nodeName);
+    m_lastUpdateTime = ros::Time::now();
 
     unsigned lwrNameLen = std::string("lwrN").size();
     std::string pluginName = _sdf->GetAttribute("name")->GetAsString();
@@ -59,8 +70,13 @@ namespace gazebo
     }
 
     // TODO
-    // send tFriMsrData to m_friPort (i.e. what friremote receives)
-    // listen on m_friPort for tFriCmdData (i.e. what friremote sends)
+    // send tFriMsrData to m_sendFriPort (i.e. what friremote receives)
+    // listen on m_recvFriPort for tFriCmdData (i.e. what friremote sends)
+    m_sendUdpSocket = new QUdpSocket();
+    m_sendUdpSocket->connectToHost(QHostAddress::LocalHost, m_sendFriPort);
+    m_recvUdpSocket = new QUdpSocket();
+    m_recvUdpSocket->bind(QHostAddress::LocalHost, m_recvFriPort);
+    // communication starts with LWR (this plugin) sending first packet (otherwise see ICRACK-component.cpp)
 
 
     // Listen to the update event. This event is broadcast every
@@ -72,8 +88,14 @@ namespace gazebo
   void
   LwrModelFRIPlugin::OnUpdate()
   {
-    updateRobotState();
-    publishRobotState();
+    ros::Duration sinceLastUpdateDuration = ros::Time::now() - m_lastUpdateTime;
+
+    if (sinceLastUpdateDuration.toSec() > m_updatePeriod) {
+      updateRobotState();
+      publishRobotState();
+    }
+
+    m_lastUpdateTime = ros::Time::now();
   }
 /*------------------------------------------------------------------------}}}-*/
 
@@ -81,7 +103,10 @@ namespace gazebo
   bool
   LwrModelFRIPlugin::loadParams(sdf::ElementPtr _sdf)
   {
-    m_friPort = ahb::string::toIntSlow<uint16_t>(_sdf->GetElement("friPort")->Get<std::string>());
+    m_nodeName = _sdf->GetParent()->Get<std::string>("name");
+
+    m_sendFriPort = ahb::string::toIntSlow<uint16_t>(_sdf->GetElement("sendFriPort")->Get<std::string>());
+    m_recvFriPort = ahb::string::toIntSlow<uint16_t>(_sdf->GetElement("recvFriPort")->Get<std::string>());
 
     return true;
   }

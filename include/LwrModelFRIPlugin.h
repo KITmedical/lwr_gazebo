@@ -8,6 +8,10 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
 
+#include <ros/ros.h>
+
+#include <QUdpSocket>
+
 // custom includes
 
 
@@ -57,8 +61,17 @@ namespace gazebo {
       event::ConnectionPtr m_updateConnection;
       physics::Joint_V m_joints;
 
+      // ros
+      ros::NodeHandle* m_node;
+      std::string m_nodeName;
+      ros::Time m_lastUpdateTime;
+
       // fri
-      uint16_t m_friPort;
+      uint16_t m_sendFriPort;
+      uint16_t m_recvFriPort;
+      double m_updatePeriod;
+      QUdpSocket* m_sendUdpSocket;
+      QUdpSocket* m_recvUdpSocket;
   
   
   };
