@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 find_package(gazebo REQUIRED)
-find_package(Qt4 REQUIRED COMPONENTS QtNetwork)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -86,9 +85,6 @@ include_directories(
 add_library(LwrModelROSPlugin
   src/LwrModelROSPlugin.cpp
 )
-add_library(LwrModelFRIPlugin
-  src/LwrModelFRIPlugin.cpp
-)
 
 ## Declare a cpp executable
 # add_executable(lwr_gazebo_node src/lwr_gazebo_node.cpp)
@@ -101,11 +97,6 @@ add_library(LwrModelFRIPlugin
 target_link_libraries(LwrModelROSPlugin
   ${catkin_LIBRARIES}
   ${GAZEBO_LIBRARIES}
-)
-target_link_libraries(LwrModelFRIPlugin
-  ${catkin_LIBRARIES}
-  ${GAZEBO_LIBRARIES}
-  ${QT_LIBRARIES}
 )
 
 #############
