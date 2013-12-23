@@ -84,18 +84,20 @@ namespace gazebo
     // listen on m_recvFriPort for tFriCmdData (i.e. what friremote sends)
     m_sendUdpSocket = new boost::asio::ip::udp::socket(m_ioService);
     m_udpResolver = new boost::asio::ip::udp::resolver(m_ioService);
-    boost::asio::ip::udp::resolver::query sendPortQuery(boost::asio::ip::udp::v4(), "localhost", ahb::string::toString(m_sendFriPort));
+    boost::asio::ip::udp::resolver::query sendPortQuery(boost::asio::ip::udp::v4(),
+                                                        "localhost",
+                                                        ahb::string::toString(m_sendFriPort));
     m_sendUdpEndpoint = *(m_udpResolver->resolve(sendPortQuery));
 
     try {
       m_sendUdpSocket->connect(m_sendUdpEndpoint);
     } catch (boost::system::system_error const& e) {
-      ROS_FATAL_STREAM("LwrModelFRIPlugin: Failed to connect FRI node:" << e.what());
+      ROS_FATAL_STREAM("LwrModelFRIPlugin: Failed to connect FRI node: " << e.what());
     }
 
-    m_recvUdpSocket = new boost::asio::ip::udp::socket(m_ioService);
-    //TODO m_recvUdpSocket->bind(QHostAddress::LocalHost, m_recvFriPort);
-    // communication starts with LWR (this plugin) sending first packet (otherwise see ICRACK-component.cpp)
+    m_recvUdpSocket = new boost::asio::ip::udp::socket(m_ioService,
+                                                       boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(),
+                                                                                      m_recvFriPort));
 
 
     // Listen to the update event. This event is broadcast every
@@ -109,12 +111,13 @@ namespace gazebo
   {
     ros::Duration sinceLastUpdateDuration = ros::Time::now() - m_lastUpdateTime;
 
-    if (sinceLastUpdateDuration.toSec() > m_updatePeriod) {
+    if (sinceLastUpdateDuration.toSec() >= m_updatePeriod) {
       updateRobotState();
       publishRobotState();
+      m_lastUpdateTime = ros::Time::now();
+    } else {
+      //std::cout << "Not publishing (periodic time not yet reached), only " << sinceLastUpdateDuration.toSec()  << "s passed" << std::endl;
     }
-
-    m_lastUpdateTime = ros::Time::now();
   }
 /*------------------------------------------------------------------------}}}-*/
 
@@ -152,7 +155,7 @@ namespace gazebo
     try {
       m_sendUdpSocket->send(boost::asio::buffer(&m_currentFriMsrData, sizeof(m_currentFriMsrData)));
     } catch (boost::system::system_error const& e) {
-      ROS_FATAL_STREAM("LwrModelFRIPlugin: Failed to send to FRI node:" << e.what());
+      ROS_FATAL_STREAM("LwrModelFRIPlugin: Failed to send to FRI node: " << e.what());
     }
   }
 /*------------------------------------------------------------------------}}}-*/
