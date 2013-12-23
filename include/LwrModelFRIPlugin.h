@@ -10,19 +10,15 @@
 
 #include <ros/ros.h>
 
-#include <QUdpSocket>
+#include <boost/asio.hpp>
+
+#include <friComm.h>
 
 // custom includes
 
 
 // forward declarations
 
-
-/* TODO
- * move to FRI interface
- * - send fri messages with 1000 Hz SIMULATED time (http://wiki.ros.org/Clock#Using_Simulation_Time_from_the_.2BAC8-clock_Topic)
- * - read answer messages and set m_joints
- */
 
 namespace gazebo {
   class LwrModelFRIPlugin
@@ -70,8 +66,11 @@ namespace gazebo {
       uint16_t m_sendFriPort;
       uint16_t m_recvFriPort;
       double m_updatePeriod;
-      QUdpSocket* m_sendUdpSocket;
-      QUdpSocket* m_recvUdpSocket;
+      boost::asio::io_service m_ioService;
+      boost::asio::ip::udp::socket* m_sendUdpSocket;
+      boost::asio::ip::udp::socket* m_recvUdpSocket;
+      tFriMsrData m_currentFriMsrData;
+      tFriCmdData m_lastFriCmdData;
   
   
   };

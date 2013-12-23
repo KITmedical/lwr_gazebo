@@ -69,13 +69,23 @@ namespace gazebo
       }
     }
 
+    memset(&m_currentFriMsrData, 0, sizeof(m_currentFriMsrData));
+    m_currentFriMsrData.head.packetSize = FRI_MSR_DATA_SIZE;
+    m_currentFriMsrData.head.datagramId = FRI_DATAGRAM_ID_MSR;
+    m_currentFriMsrData.intf.state = FRI_STATE_CMD;
+    m_currentFriMsrData.intf.quality = FRI_QUALITY_PERFECT;
+    m_currentFriMsrData.robot.power = 0x7F; // all drives on
+    m_currentFriMsrData.robot.control = FRI_CTRL_POSITION;
+
+    memset(&m_lastFriCmdData, 0, sizeof(m_lastFriCmdData));
+
     // TODO
     // send tFriMsrData to m_sendFriPort (i.e. what friremote receives)
     // listen on m_recvFriPort for tFriCmdData (i.e. what friremote sends)
-    m_sendUdpSocket = new QUdpSocket();
-    m_sendUdpSocket->connectToHost(QHostAddress::LocalHost, m_sendFriPort);
-    m_recvUdpSocket = new QUdpSocket();
-    m_recvUdpSocket->bind(QHostAddress::LocalHost, m_recvFriPort);
+    m_sendUdpSocket = new boost::asio::ip::udp::socket(m_ioService);
+    //TODO m_sendUdpSocket->connectToHost(QHostAddress::LocalHost, m_sendFriPort);
+    m_recvUdpSocket = new boost::asio::ip::udp::socket(m_ioService);
+    //TODO m_recvUdpSocket->bind(QHostAddress::LocalHost, m_recvFriPort);
     // communication starts with LWR (this plugin) sending first packet (otherwise see ICRACK-component.cpp)
 
 
@@ -119,6 +129,18 @@ namespace gazebo
   void
   LwrModelFRIPlugin::publishRobotState()
   {
+    m_currentFriMsrData.head.sendSeqCount++;
+    m_currentFriMsrData.head.reflSeqCount = m_lastFriCmdData.head.sendSeqCount;
+
+    m_currentFriMsrData.intf.timestamp = ros::Time::now().toSec();
+
+    for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
+      physics::JointPtr currJoint = m_joints[jointIdx];
+      m_currentFriMsrData.data.msrJntPos[jointIdx] = currJoint->GetAngle(0).Radian();
+      //m_currentFriMsrData.data.msrCartPos[jointIdx] = TODO
+    }
+
+    //TODO m_sendUdpSocket->write((char*)&m_currentFriMsrData, sizeof(m_currentFriMsrData));
   }
 /*------------------------------------------------------------------------}}}-*/
 
