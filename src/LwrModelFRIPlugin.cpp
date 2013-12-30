@@ -95,8 +95,6 @@ namespace gazebo
     m_recvUdpSocket = new boost::asio::ip::udp::socket(m_ioService,
                                                        boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(),
                                                                                       m_recvFriPort));
-    m_recvUdpSocket->non_blocking(true);
-
 
     // Listen to the update event. This event is broadcast every
     // simulation iteration.
@@ -134,17 +132,26 @@ namespace gazebo
   void
   LwrModelFRIPlugin::updateRobotState()
   {
+    if (m_recvUdpSocket->available() == 0) {
+      if (m_currentFriMsrData.head.sendSeqCount != 0) {
+        ROS_FATAL_STREAM("LwrModelFRIPlugin: No UDP data (tFriCmdData) received");
+      }
+      return;
+    }
+
     boost::asio::ip::udp::endpoint sender_endpoint;
-    socket_base::message_flags flags;
+    boost::asio::socket_base::message_flags flags;
     boost::system::error_code error;
     m_recvUdpSocket->receive_from(boost::asio::buffer(&m_lastFriCmdData, sizeof(m_lastFriCmdData)),
                                   sender_endpoint,
                                   flags,
                                   error);
-    if (error == boost::asio::error::would_block) {
-      std::cout << "No UDP data received" << std::endl;
-    } else if (error) {
+    if (error) {
       ROS_FATAL_STREAM("LwrModelFRIPlugin: Failed receive_from(): " << error);
+    }
+
+    for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
+      m_joints[jointIdx]->SetAngle(0, m_lastFriCmdData.cmd.jntPos[jointIdx]);
     }
   }
 
