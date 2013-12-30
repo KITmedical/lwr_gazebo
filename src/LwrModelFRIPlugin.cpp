@@ -79,9 +79,6 @@ namespace gazebo
 
     memset(&m_lastFriCmdData, 0, sizeof(m_lastFriCmdData));
 
-    // TODO
-    // send tFriMsrData to m_sendFriPort (i.e. what friremote receives)
-    // listen on m_recvFriPort for tFriCmdData (i.e. what friremote sends)
     m_sendUdpSocket = new boost::asio::ip::udp::socket(m_ioService);
     m_udpResolver = new boost::asio::ip::udp::resolver(m_ioService);
     boost::asio::ip::udp::resolver::query sendPortQuery(boost::asio::ip::udp::v4(),
@@ -98,6 +95,7 @@ namespace gazebo
     m_recvUdpSocket = new boost::asio::ip::udp::socket(m_ioService,
                                                        boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(),
                                                                                       m_recvFriPort));
+    m_recvUdpSocket->non_blocking(true);
 
 
     // Listen to the update event. This event is broadcast every
@@ -136,6 +134,18 @@ namespace gazebo
   void
   LwrModelFRIPlugin::updateRobotState()
   {
+    boost::asio::ip::udp::endpoint sender_endpoint;
+    socket_base::message_flags flags;
+    boost::system::error_code error;
+    m_recvUdpSocket->receive_from(boost::asio::buffer(&m_lastFriCmdData, sizeof(m_lastFriCmdData)),
+                                  sender_endpoint,
+                                  flags,
+                                  error);
+    if (error == boost::asio::error::would_block) {
+      std::cout << "No UDP data received" << std::endl;
+    } else if (error) {
+      ROS_FATAL_STREAM("LwrModelFRIPlugin: Failed receive_from(): " << error);
+    }
   }
 
   void
