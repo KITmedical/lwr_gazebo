@@ -9,10 +9,12 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   lwr_analytical_kinematics
   ahbstring
+  lwr_friremote
 )
 
 ## System dependencies are found with CMake's conventions
 find_package(gazebo REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -78,7 +80,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${GAZEBO_INCLUDE_DIRS}
-  ${QT_INCLUDES}
+  ${Boost_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -97,6 +99,11 @@ add_library(LwrModelROSPlugin
 target_link_libraries(LwrModelROSPlugin
   ${catkin_LIBRARIES}
   ${GAZEBO_LIBRARIES}
+)
+target_link_libraries(LwrModelFRIPlugin
+  ${catkin_LIBRARIES}
+  ${GAZEBO_LIBRARIES}
+  ${Boost_LIBRARIES}
 )
 
 #############
