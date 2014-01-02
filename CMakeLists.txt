@@ -84,8 +84,8 @@ include_directories(
 )
 
 ## Declare a cpp library
-add_library(LwrModelROSPlugin
-  src/LwrModelROSPlugin.cpp
+add_library(LwrModelFRIPlugin
+  src/LwrModelFRIPlugin.cpp
 )
 
 ## Declare a cpp executable
@@ -96,10 +96,6 @@ add_library(LwrModelROSPlugin
 # add_dependencies(lwr_gazebo_node lwr_gazebo_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(LwrModelROSPlugin
-  ${catkin_LIBRARIES}
-  ${GAZEBO_LIBRARIES}
-)
 target_link_libraries(LwrModelFRIPlugin
   ${catkin_LIBRARIES}
   ${GAZEBO_LIBRARIES}
