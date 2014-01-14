@@ -7,7 +7,6 @@
 #include <boost/bind.hpp>
 
 // custom includes
-#include <lwr/LwrLibrary.hpp>
 #include <ahbstring.h>
 
 

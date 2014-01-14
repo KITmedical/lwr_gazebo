@@ -7,7 +7,6 @@ project(lwr_gazebo)
 find_package(catkin REQUIRED COMPONENTS
   gazebo_ros
   roscpp
-  lwr_analytical_kinematics
   ahbstring
   lwr_friremote
 )
