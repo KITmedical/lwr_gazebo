@@ -150,6 +150,16 @@ namespace gazebo
     }
 
     for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
+      if (m_lastFriCmdData.cmd.jntPos[jointIdx] < m_joints[jointIdx]->GetLowerLimit(0).Radian()) {
+        ROS_FATAL_STREAM("Joint" << jointIdx << " below joint limit (" << m_joints[jointIdx]->GetLowerLimit(0).Radian() << "). Will not move robot at all.\n");
+        return;
+      } else if (m_lastFriCmdData.cmd.jntPos[jointIdx] > m_joints[jointIdx]->GetUpperLimit(0).Radian()) {
+        ROS_FATAL_STREAM("Joint" << jointIdx << " above joint limit (" << m_joints[jointIdx]->GetUpperLimit(0).Radian() << "). Will not move robot at all.\n");
+        return;
+      }
+    }
+
+    for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
       m_joints[jointIdx]->SetAngle(0, m_lastFriCmdData.cmd.jntPos[jointIdx]);
     }
   }
