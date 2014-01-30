@@ -122,8 +122,8 @@ namespace gazebo
   {
     m_nodeName = _sdf->GetParent()->Get<std::string>("name");
 
-    m_sendFriPort = ahb::string::toIntSlow<uint16_t>(_sdf->GetElement("sendFriPort")->Get<std::string>());
-    m_recvFriPort = ahb::string::toIntSlow<uint16_t>(_sdf->GetElement("recvFriPort")->Get<std::string>());
+    m_sendFriPort = ahb::string::toNumberSlow<uint16_t>(_sdf->GetElement("sendFriPort")->Get<std::string>());
+    m_recvFriPort = ahb::string::toNumberSlow<uint16_t>(_sdf->GetElement("recvFriPort")->Get<std::string>());
 
     return true;
   }
