@@ -2,7 +2,7 @@
 <package>
   <name>lwr_gazebo</name>
   <version>0.0.0</version>
-  <description>The lwr_gazebo package</description>
+  <description>Gazebo plugin exposing a KUKA FRI interface to a simulated KUKA LWR4+</description>
   <maintainer email="andreas.bihlmaier@gmx.de">Andreas Bihlmaier</maintainer>
   <license>MIT</license>
 
