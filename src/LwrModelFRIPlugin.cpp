@@ -160,7 +160,7 @@ namespace gazebo
     }
 
     for (size_t jointIdx = 0; jointIdx < m_joints.size(); jointIdx++) {
-      m_joints[jointIdx]->SetPosition(0, m_lastFriCmdData.cmd.jntPos[jointIdx]);
+      m_joints[jointIdx]->SetAngle(0, m_lastFriCmdData.cmd.jntPos[jointIdx]);
     }
   }
 
